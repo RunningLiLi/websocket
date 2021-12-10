@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<!-- ## LV III ### 题目 现给定一接口 `ws://anonym.ink:8000/homework/chatroom?username=xxx`，
+    可通过它与服务器建立 WebSocket 连接。其中参数 `username`
+是你的进入聊天室时的用户名，为空则默认为 `Anonymous`. 当有人进入聊天室时
+，会收到以下格式内容： ```javascript { type: "OPEN", username: "李小钰", avatar:
+"https://avatars.githubusercontent.com/u/87082575?v=4" } ``` 当有人发送信息时
+，会收到以下格式内容： ```javascript { type: "MESSAGE",
+username: "马小仪", data: "前端的技术栈哪个我没学过？布鲁奈尔的钰姐，不知道比你们高到哪里去了
+，我和她谈笑风生。", avatar:
+"https://avatars.githubusercontent.com/u/72426675?v=4" } ``` 当有人退出聊天室时
+，会收到以下格式内容： ```javascript { type: "CLOSE",
+username: "曾小捷", avatar: "https://avatars.githubusercontent.com/u/72637162?v=4" } ``` -
+要求：使用题目给定接口完成一个优(jiǎn)雅(lòu)的聊天室，并提交证明可以在不同的设备之间互相吹水的截图
+（比如试着和你的小伙伴们在里面一起吹水）； - 扩展项：实现图片的发送与接收功能（使用绝对链接实现即可）。 ### NEXT LV
+无，但服务器每隔五分钟会向与服务器建立连接的客户端广播一次彩蛋。 -->
+<style>
+    div {
+        background-color: rgb(209, 250, 250);
+        width: 550px;
+        height: 700px;
+        margin-left: 30%;
+        border-radius: 3%;
+       
+        font-size: x-large;
+    }
+
+    textarea {
+        background-color: darkkhaki;
+        margin-left: 40%;
+    }
+
+    button {
+        background-color: rgb(59, 71, 54);
+        border-radius: 3%;
+    }
+
+    span {
+        color: red;
+        margin-left: 470px;
+        background-color: rgb(148, 144, 144);
+    }
+
+    li {
+        list-style: none;
+    }
+    img{
+        width: 30px;
+        height: 30px;
+        border-radius: 100%;
+    }
+</style>
+
+<body style="background-color: darkgrey;">
+    <span>离开</span>
+    <div></div>
+    <textarea name="" id="" cols="30" rows="5"></textarea>
+    <button>发送</button>
+    <script>
+        const div = document.querySelector('div');
+        const textarea = document.querySelector('textarea');
+        const but = document.querySelector('button');
+        const span = document.querySelector('span');
+        but.addEventListener('click', () => {
+            let li = document.createElement('li');
+           
+            ws.send(textarea.value);
+            textarea.value = '';
+
+        });
+        const ws = new WebSocket('wss://anonym.ink:8000/homework/chatroom?username=卷卷&avatar=https://avatars.githubusercontent.com/u/72426675?v=4');
+        ws.onopen = () => {
+            span.innerHTML = '在线';
+            span.style.color = 'green';
+        };
+        ws.onclose = () => {
+            span.innerHTML = '离开';
+            span.style.color = 'red';
+        };
+        ws.onmessage = (rec) => {
+            const Data = JSON.parse(rec.data);
+            const data = Data.data;
+            const name = Data.username;
+            const avatar = Data.avatar;
+            console.log(avatar);
+            let li = document.createElement('li');
+            
+            if (Data.type == 'OPEN') {
+                div.appendChild(li);
+                li.innerHTML = name + "进来了";
+                setTimeout(() => {
+                    li.innerHTML = '';
+                }, 1000);
+            }
+            if (Data.type == 'MESSAGE') {
+                let a=document.createElement('img');
+                a.src=avatar;
+                div.appendChild(a);
+                div.appendChild(li);
+                li.innerHTML=name+':'+data;
+             
+            }
+            if (Data.type == 'CLOSE') {
+               
+                div.appendChild(li);
+                li.innerHTML = name + "走了";
+                setTimeout(() => {
+                    li.innerHTML = '';
+                }, 1000);
+            }
+        };
+
+    </script>
+</body>
+
+</html>
